@@ -1,0 +1,61 @@
+---
+title: "Publikationer Lärarutbildningen"
+author: "Greta Linder"
+date: '2017-05-08'
+output: 
+  pdf_document:
+    latex_engine: xelatex
+mainfont: DejaVu Serif
+classoption: landscape
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plyr)
+library(tidyverse)
+library(pander)
+```
+
+## Forskningspublikationer knutna till Lärarutbildningen
+
+En sökning i DiVA 2017-05-08 på forskningspublikationer tillhörande organisationen Lärarubildningen eller med nationella ämneskategorin Utbildningsvetenskap (inkl underkategorier) visar följande antal publikationer:
+
+```{r utbvet_5, results='asis', echo=FALSE}
+
+#Utsökningsfil från DiVA
+utbildningsvet <- read.csv(file="utbvet_16.csv", header = TRUE)
+knitr::kable(table(utbildningsvet$PublicationType, -utbildningsvet$Year))
+```
+```{r organisation, echo=FALSE}
+#Enbart organisationen Lärarutbildningen
+lararutb <- read.csv(file = "enbart_lar.csv", header = TRUE)
+lararutb_n <- nrow(lararutb)
+
+#Antal publikationer
+totalt <- nrow(utbildningsvet)
+```
+
+```{r, include=FALSE}
+#Antal indexeringar i WoS
+WoS <- subset(utbildningsvet, ISI !="")
+WoSn <- nrow(WoS)
+
+#Antal indexeringar i Scopus
+Scopus <- subset(utbildningsvet, ScopusId !="")
+Scopusn <- nrow(Scopus)
+
+#Nivå 1 eller 2 i norskan listan
+Norska <- subset(utbildningsvet, FridaLevel !="0")
+norn <- nrow(Norska)
+```
+
+Av dessa `r totalt` publikationer var `r WoSn` publikationer indexerade i databasen Web of Science, `r Scopusn` indexerade i databasen Scopus och `r norn` hade nivå 1 eller 2 i den norska listan över publikationskanaler. `r lararutb_n` författare var knutna till Lärarutbildningen i organsiationsfältet.
+
+\pagebreak
+
+##Lista över samtliga publikationer i uttaget
+Listan är sorterad fallande efter publiceringsår. Kolumnen FridaLevel visar nivån i norska listan över publiceringskanaler. ISI och ScopusId visar id-nummer i databaseran Web of Science respektive Scopus.
+
+```{r, echo=FALSE}
+pander::pander(utbildningsvet[,c("Title", "Year", "PublicationType", "Journal", "Publisher", "FridaLevel", "ISI", "ScopusId")], split.cell = 30, split.table = Inf, justify = "left", missing = "")
+```
