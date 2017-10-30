@@ -1,2 +1,4 @@
 # bibliometrics
-Explorative analysis and thesaurus for organizations.
+Analysis for explorative purposes.
+
+Thesaurus for swedish universities to use with WOSviwer.
