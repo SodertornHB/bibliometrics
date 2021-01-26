@@ -1,6 +1,6 @@
 #
 # ostersjo
-# GL 200831
+# GL 200831/201221
 # Rapportering till Östersjöstiftelsen
 # Statistik med DiVA som källa.
 #
@@ -44,7 +44,8 @@ diva$SeriesEISSN[is.na(diva$SeriesEISSN)] <- 0L
 
 publ_vet <- diva %>%
   filter(PublicationType=="Artikel i tidskrift"|PublicationType=="Artikel, forskningsöversikt"
-         |PublicationType=="Kapitel i bok, del av antologi"|PublicationType=="Bok"|PublicationType=="Konferensbidrag") %>%
+         |PublicationType=="Kapitel i bok, del av antologi"|PublicationType=="Bok"|PublicationType=="Konferensbidrag"
+         |PublicationType=="Doktorsavhandling, monografi" |PublicationType=="Doktorsavhandling, sammanläggning") %>%
   filter(ContentType!="Övrig (populärvetenskap, debatt, mm)") %>%
   filter((is.na(Status))|Status=="published")%>%
   filter(is.na(PublicationSubtype)|PublicationSubtype == "publishedPaper")%>%
@@ -55,7 +56,10 @@ publ_vet$PublicationType <- recode(publ_vet$PublicationType,
                                   "Artikel, forskningsöversikt" = "Artikel",
                                   "Kapitel i bok, del av antologi" = "Kapitel",
                                   "Bok" = "Monografi",
-                                  "Konferensbidrag" = "Publicerat konferensbidrag")
+                                  "Konferensbidrag" = "Publicerat konferensbidrag",
+                                  "Doktorsavhandling, monografi" = "Doktorsavhandling",
+                                  "Doktorsavhandling, sammanläggning" = "Doktorsavhandling")
+                                  
 
 publ_tabell <- publ_vet %>%
   group_by(PublicationType, ContentType) %>% 
@@ -172,6 +176,7 @@ oa_andel_kap <- oa_stats_kap %>%
   select(Year, sh_kap_andel_oa, baltic_kap_andel) %>%
   arrange(Year)
 
+write_csv(oa_stats_kap, "Antal_oa_kapitel.csv")
 write_excel_csv2(oa_andel_kap, "Andel_oa_kapitel.csv")
 
 # Open Access artikel -----------------------------------------------------
@@ -212,7 +217,7 @@ oss_art <- publ_vet %>%
 
 oa_oss_art <- publ_vet %>%
   filter(PublicationType == "Artikel") %>%
-  filter(baltic == TRUE) %>%
+  filter(oss == TRUE) %>%
   filter(FreeFulltext == TRUE | (!(is.na(FullTextLink)))) %>%
   count(Year)
 
@@ -235,7 +240,7 @@ oa_andel_art <- oa_stats_art %>%
   select(Year, sh_art_andel_oa, baltic_art_andel, oss_art_andel) %>%
   arrange(Year)
   
-
+write_csv(oa_stats_art, "Antal_oa_artiklar.csv")
 write_excel_csv2(oa_andel_art, "Andel_oa_artiklar.csv")
 
 
@@ -675,7 +680,9 @@ sh_archive_resource("SH_artiklar_index.csv")
 sh_archive_resource("Övriga_norska.csv")
 sh_archive_resource("SH_övriga_index.csv")
 sh_archive_resource("Östersjö_övriga_index.csv")
+sh_archive_resource("Antal_oa_artiklar.csv")
 sh_archive_resource("Andel_oa_artiklar.csv")
+sh_archive_resource("Antal_oa_kapitel.csv")
 sh_archive_resource("Andel_oa_kapitel.csv")
 sh_archive_resource("Språk.csv")
 sh_archive_df(diva, "Diva_rådata.csv")
